@@ -1,0 +1,721 @@
+{
+  "datasets": [
+    {
+      "name": "ac8f1c71",
+      "displayName": "destaque_impacto",
+      "queryLines": [
+        "WITH base AS (\r\n",
+        "  SELECT \r\n",
+        "    data,\r\n",
+        "    variacao_ipca,\r\n",
+        "    variacao_boi,\r\n",
+        "    ABS(variacao_ipca - variacao_boi) AS diferenca_abs\r\n",
+        "  FROM workspace.gold_economia.vw_gold_dashboard\r\n",
+        "),\r\n",
+        "limiar AS (\r\n",
+        "  SELECT PERCENTILE_APPROX(diferenca_abs, 0.5) AS mediana\r\n",
+        "  FROM base\r\n",
+        ")\r\n",
+        "SELECT \r\n",
+        "  b.data,\r\n",
+        "  CASE \r\n",
+        "    WHEN b.diferenca_abs <= l.mediana THEN 'Empate'\r\n",
+        "    WHEN b.variacao_ipca > b.variacao_boi THEN 'Inflação cresce mais'\r\n",
+        "    ELSE 'Preço do boi cresce mais'\r\n",
+        "  END AS destaque,\r\n",
+        "  CASE \r\n",
+        "    WHEN b.diferenca_abs <= l.mediana THEN 'Baixa divergência'\r\n",
+        "    ELSE 'Alta divergência'\r\n",
+        "  END AS classe_impacto\r\n",
+        "FROM base b\r\n",
+        "CROSS JOIN limiar l"
+      ]
+    },
+    {
+      "name": "a7bbb147",
+      "displayName": "vw_gold_dashboard",
+      "config": {
+        "version": "1.1",
+        "source": "workspace.gold_economia.vw_gold_dashboard",
+        "dimensions": [
+          {
+            "name": "data",
+            "expr": "data"
+          },
+          {
+            "name": "ipca",
+            "expr": "ipca"
+          },
+          {
+            "name": "boi_gordo",
+            "expr": "boi_gordo"
+          },
+          {
+            "name": "data_coleta",
+            "expr": "data_coleta"
+          },
+          {
+            "name": "variacao_ipca",
+            "expr": "variacao_ipca"
+          },
+          {
+            "name": "variacao_boi",
+            "expr": "variacao_boi"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "displayName": "Count"
+          },
+          {
+            "name": "media_ipca",
+            "expr": "AVG(ipca)",
+            "displayName": "Média IPCA"
+          },
+          {
+            "name": "media_boi",
+            "expr": "AVG(boi_gordo)",
+            "displayName": "Média Boi Gordo"
+          },
+          {
+            "name": "media_var_ipca",
+            "expr": "AVG(variacao_ipca)",
+            "displayName": "Média Variação IPCA"
+          },
+          {
+            "name": "media_var_boi",
+            "expr": "AVG(variacao_boi)",
+            "displayName": "Média Variação Boi"
+          }
+        ]
+      }
+    },
+    {
+      "name": "correlacao",
+      "displayName": "Correlação IPCA e Boi",
+      "queryLines": [
+        "SELECT\n",
+        "  CORR(variacao_ipca, variacao_boi) as correlacao\n",
+        "FROM\n",
+        "  workspace.gold_economia.vw_gold_dashboard\n",
+        "WHERE\n",
+        "  variacao_ipca IS NOT NULL\n",
+        "  AND variacao_boi IS NOT NULL"
+      ]
+    },
+    {
+      "name": "60e7333b",
+      "displayName": "insights",
+      "config": {
+        "version": "1.1",
+        "source": "workspace.gold_economia.insights",
+        "dimensions": [
+          {
+            "expr": "source.*"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "46e1fb27",
+      "displayName": "ipca",
+      "config": {
+        "version": "1.1",
+        "source": "workspace.bronze_economia.ipca",
+        "dimensions": [
+          {
+            "expr": "source.*"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "33f8718d",
+      "displayName": "boi_gordo_cepea",
+      "config": {
+        "version": "1.1",
+        "source": "workspace.bronze_economia.boi_gordo_cepea",
+        "dimensions": [
+          {
+            "expr": "source.*"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "367edd94",
+      "displayName": "boi_gordo",
+      "config": {
+        "version": "1.1",
+        "source": "workspace.bronze_economia.boi_gordo",
+        "dimensions": [
+          {
+            "expr": "source.*"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "70525a71",
+      "displayName": "economia",
+      "config": {
+        "version": "1.1",
+        "source": "workspace.silver_economia.economia",
+        "dimensions": [
+          {
+            "expr": "source.*"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "variacoes_2025",
+      "displayName": "Variações 2025 - IPCA e Boi Gordo",
+      "queryLines": [
+        "SELECT\n",
+        "  data,\n",
+        "  'Variação IPCA' as indicador,\n",
+        "  variacao_ipca as variacao\n",
+        "FROM\n",
+        "  workspace.gold_economia.vw_gold_dashboard\n",
+        "WHERE\n",
+        "  YEAR(data) = 2025\n",
+        "  AND variacao_ipca IS NOT NULL\n",
+        "UNION ALL\n",
+        "SELECT\n",
+        "  data,\n",
+        "  'Variação Boi Gordo' as indicador,\n",
+        "  variacao_boi as variacao\n",
+        "FROM\n",
+        "  workspace.gold_economia.vw_gold_dashboard\n",
+        "WHERE\n",
+        "  YEAR(data) = 2025\n",
+        "  AND variacao_boi IS NOT NULL\n",
+        "ORDER BY\n",
+        "  data,\n",
+        "  indicador"
+      ]
+    },
+    {
+      "name": "destaque_impacto",
+      "displayName": "Destaque e Impacto",
+      "queryLines": [
+        "WITH base AS (\n",
+        "  SELECT\n",
+        "    data,\n",
+        "    variacao_ipca,\n",
+        "    variacao_boi,\n",
+        "    ABS(variacao_ipca - variacao_boi) AS diferenca_abs\n",
+        "  FROM\n",
+        "    workspace.gold_economia.vw_gold_dashboard\n",
+        "),\n",
+        "limiar AS (\n",
+        "  SELECT\n",
+        "    PERCENTILE_APPROX(diferenca_abs, 0.5) AS mediana\n",
+        "  FROM\n",
+        "    base\n",
+        ")\n",
+        "SELECT\n",
+        "  b.data,\n",
+        "  b.variacao_ipca,\n",
+        "  b.variacao_boi,\n",
+        "  b.diferenca_abs,\n",
+        "  CASE\n",
+        "    WHEN b.diferenca_abs <= l.mediana THEN 'Empate'\n",
+        "    WHEN b.variacao_ipca > b.variacao_boi THEN 'Inflação cresce mais'\n",
+        "    ELSE 'Preço do boi cresce mais'\n",
+        "  END AS destaque,\n",
+        "  CASE\n",
+        "    WHEN b.diferenca_abs <= l.mediana THEN 'Baixa divergência'\n",
+        "    ELSE 'Alta divergência'\n",
+        "  END AS classe_impacto\n",
+        "FROM\n",
+        "  base b CROSS JOIN limiar l\n",
+        "ORDER BY\n",
+        "  b.data DESC"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "354b0247",
+      "displayName": "Untitled page",
+      "layout": [
+        {
+          "widget": {
+            "name": "correlacao_card",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "correlacao",
+                  "fields": [
+                    {
+                      "name": "correlacao",
+                      "expression": "`correlacao`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Correlação IPCA x Boi",
+                "showTitle": true,
+                "showDescription": false
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "correlacao",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 3,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "tabela_dados",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "a7bbb147",
+                  "fields": [
+                    {
+                      "name": "data",
+                      "expression": "`data`"
+                    },
+                    {
+                      "name": "ipca",
+                      "expression": "`ipca`"
+                    },
+                    {
+                      "name": "boi_gordo",
+                      "expression": "`boi_gordo`"
+                    },
+                    {
+                      "name": "variacao_boi",
+                      "expression": "`variacao_boi`"
+                    },
+                    {
+                      "name": "variacao_ipca",
+                      "expression": "`variacao_ipca`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Informação de variação",
+                "showTitle": true
+              },
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "data"
+                  },
+                  {
+                    "fieldName": "ipca"
+                  },
+                  {
+                    "fieldName": "boi_gordo"
+                  },
+                  {
+                    "fieldName": "variacao_boi"
+                  },
+                  {
+                    "fieldName": "variacao_ipca"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 12,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "media_ipca",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "a7bbb147",
+                  "fields": [
+                    {
+                      "name": "measure(media_ipca)",
+                      "expression": "MEASURE(`media_ipca`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Média IPCA",
+                "showTitle": true
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(media_ipca)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "media_boi",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "a7bbb147",
+                  "fields": [
+                    {
+                      "name": "measure(media_boi)",
+                      "expression": "MEASURE(`media_boi`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Média Boi Gordo",
+                "showTitle": true
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(media_boi)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "media_var_ipca",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "a7bbb147",
+                  "fields": [
+                    {
+                      "name": "measure(media_var_ipca)",
+                      "expression": "MEASURE(`media_var_ipca`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Média Var. IPCA",
+                "showTitle": true
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(media_var_ipca)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "media_var_boi",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "a7bbb147",
+                  "fields": [
+                    {
+                      "name": "measure(media_var_boi)",
+                      "expression": "MEASURE(`media_var_boi`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Média Var. Boi",
+                "showTitle": true
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(media_var_boi)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 0,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "bar_chart",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "variacoes_2025",
+                  "fields": [
+                    {
+                      "name": "indicador",
+                      "expression": "`indicador`"
+                    },
+                    {
+                      "name": "data",
+                      "expression": "`data`"
+                    },
+                    {
+                      "name": "variacao",
+                      "expression": "`variacao`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Variações 2025 - IPCA e Boi Gordo",
+                "showTitle": true
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "data",
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "y": {
+                  "fieldName": "variacao",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "indicador",
+                  "legend": {
+                    "hide": false
+                  },
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "Variação IPCA",
+                        "color": "#15AFDD"
+                      },
+                      {
+                        "value": "Variação Boi Gordo",
+                        "color": "#C85070"
+                      }
+                    ]
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 9,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "tabela_destaque",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "destaque_impacto",
+                  "fields": [
+                    {
+                      "name": "data",
+                      "expression": "`data`"
+                    },
+                    {
+                      "name": "destaque",
+                      "expression": "`destaque`"
+                    },
+                    {
+                      "name": "classe_impacto",
+                      "expression": "`classe_impacto`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Análise de Destaque e Impacto",
+                "showTitle": true
+              },
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "data"
+                  },
+                  {
+                    "fieldName": "destaque"
+                  },
+                  {
+                    "fieldName": "classe_impacto"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 15,
+            "width": 12,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
