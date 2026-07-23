@@ -42,7 +42,7 @@ arquitetura medalhão seguem o que foi ensinado no curso.
 ### 🥉 Bronze
 
 - `bronze_economia.ipca`: dados extraídos via API do Banco Central (série 433 – IPCA)
-- `bronze_economia.boi_gordo`: dados extraídos via web scraping do site da CEPEA
+- `bronze_economia.boi_gordo`: dados extraídos indicador excel da CEPEA
 - Ambas as tabelas recebem uma coluna `data_coleta` (timestamp da ingestão)
 
 ### 🥈 Silver
