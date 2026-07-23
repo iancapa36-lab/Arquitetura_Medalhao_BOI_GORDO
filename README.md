@@ -21,7 +21,7 @@ como o preço da carne pode impactar a inflação no Brasil.
 Este projeto teve como base um estudo desenvolvido durante o curso de pós-graduação
 em Engenharia de Dados e IA (Anhanguera).
 
-A fonte de dados (API do Banco Central e scraping da CEPEA) e a estrutura de
+A fonte de dados (API do Banco Central e indicador de excel da CEPEA) e a estrutura de
 arquitetura medalhão seguem o que foi ensinado no curso.
 
 ### ➕ O que foi desenvolvido por conta própria
