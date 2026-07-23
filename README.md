@@ -9,7 +9,6 @@ Pipeline de dados em arquitetura medalhão (Bronze, Silver e Gold) que cruza a
 variação do IPCA com a variação do preço do boi gordo, gerando insights sobre
 como o preço da carne pode impactar a inflação no Brasil.
 
-> ⚠️ **Projeto de estudo** — parte dos dados/regras é ilustrativa.
 
 <br>
 
